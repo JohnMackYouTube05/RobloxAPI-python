@@ -1,33 +1,13 @@
 #Roblox API Python Wrapper
-#by JohnMackYT
+#by JohnMackYouTube05
 import requests #Literally the backbone to this program, apart from api.roblox.com
 import json
 import warnings
 import os
 import getpass
-def AuthAPI(cookie):
-    """STORES YOUR COOKIE IN A FILE LOCALLY ON YOUR PC TO USE WITH THE API. THIS COOKIE ONLY GOES TO ROBLOX, AND YOUR COMPUTER'S HARD DRIVE. NOWHERE ELSE."""
-    os.mkdir(rf"C:\Users\{getpass.getuser()}\AppData\Roaming\RobloxAPI")
-    try:
-        # Create  Directory  MyDirectory 
-        os.mkdir(rf"C:\Users\{getpass.getuser()}\AppData\Roaming\RobloxAPI")
-        #print if directory created successfully...
-        print("Directory Created") 
-    except FileExistsError:
-        ##print if directory already exists...
-        print("Cookie Stored")
-    else:
-        """hwee"""
-    with open(rf"C:\Users\{getpass.getuser()}\AppData\Roaming\RobloxAPI\cookies.txt", 'a') as cookies:
-        c = "{'.ROBLO_SECURITY': " + cookie + "}"
-        cookies.write(c)
-        cookies.close()
 
-def readCookie():
-    with open(rf"C:\Users\{getpass.getuser()}\AppData\Roaming\RobloxAPI\cookies.txt", 'r') as cookies:
-        c = cookies.read()
-        cookies.close()
-        return c
+global cookie
+cookie = {'.ROBLOSECURITY': "your cookie here"}
 class Users:
     """all functions for the user API"""
     def getUserStatus(UserId):
@@ -56,7 +36,7 @@ class Users:
         joinDate = j['created']
         description = j['description']
         return displayName,name,uid,isBanned,joinDate,description
-    def searchUsers(keyword, limit):
+    def searchUsers(keyword, limit=None):
         """Searches for users by keyword. Limit variable can be 10, 25, 50, or 100, representing how many users this function can give back, if there is enough to fill that many usernames."""
         url = f"https://users.roblox.com/v1/users/search?keyword={keyword}&limit={limit}"
         acceptableLimits = (10, 25, 50, 100)
@@ -97,13 +77,12 @@ class Games:
     def getGameInfo(placeId):
         """Retrieves info about a game with the inputted place ID."""
         url = f"https://games.roblox.com/v1/games/multiget-place-details?placeIds={placeId}"
-        cookies = readCookie()
-        r = requests.get(url, cookies=cookies)
+        r = requests.get(url, cookies=cookie)
         j = json.loads(r.text)
         return j
 class Groups:
     def getGroupInfo(groupId):
-        """"""
+        """Gets group details for the specified group ID."""
         url = f"https://groups.roblox.com/v1/groups/{groupId}"
         r = requests.get(url)
         j = json.loads(r.text)
@@ -184,7 +163,7 @@ class Catalog:
         if appStore not in appStores:
             Exception(f"No valid app store was provided. Valid choices are {appStores}.")
         else:
-            url = "https://catalog.roblox.com/v1/exclusive-items/{appStore}/bundles"
+            url = f"https://catalog.roblox.com/v1/exclusive-items/{appStore}/bundles"
             r = requests.get(url)
             j = json.loads(r.text)
             return j['data']
