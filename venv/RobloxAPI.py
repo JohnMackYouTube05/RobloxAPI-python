@@ -5,7 +5,7 @@ import json
 import warnings
 import os
 import getpass
-
+from PIL import Image
 global cookie
 cookie = {'.ROBLOSECURITY': "your cookie here"}
 class Users:
@@ -328,3 +328,251 @@ class Develop:
         r = requests.get(url, cookies=cookie)
         j = json.loads(r.text)
         return j
+class Thumbnails:
+    def downloadAssetThumbnail(assetId, size, isCircular=None):
+        "Downloads the thumbnail for the specified asset."
+        url = f"https://thumbnails.roblox.com/v1/assets?assetIds={assetId}&format=Png&isCircular={isCircular}&size={size}"
+        if isCircular == None:
+            isCircular = False #Default
+        validSizes = ('30x30', '42x42', '50x50', '60x62', '75x75', '110x110', '140x140', '150x150', '160x100', '160x600', '250x250', '256x144','300x250','304x166','384x216','396x216','420x420','480x270','512x512','576x324','700x700','728x90','768x432')
+        if size in validSizes:
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            filename = imageUrl.split("/")[-1]
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f'Error: Image could not be retrieved; request returned code {r.status_code}')
+                return
+        else:
+            print(f"Please enter a valid size. Valid sizes are {validSizes}")
+            return
+    def downloadBadgeIcon(badgeId, isCircular=None):
+        "Downloads badge icon for the set badge ID."
+        if isCircular == None:
+            isCircular = False
+        url = f"https://thumbnails.roblox.com/v1/badges/icons?badgeIds={badgeId}&format=Png&isCircular={isCircular}&size=150x150"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        imageUrl = j['data']['imageUrl']
+        r = requests.get(imageUrl)
+        filename = imageUrl.split("/")[-1]
+        if r.status_code == 200:
+            r.raw.decode_content = True
+            with open(filename, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+            print(f'Image successfully downloaded: {filename}')
+            i = Image.open(filename, mode='r')
+            i.show()
+            return i
+        else:
+            warnings.warn(f'Error: Image could not be retrieved; request returned code {r.status_code}')
+            return f"Error Code {r.status_code}"
+    def downloadGamePassIcon(gamePassId, isCircular=None):
+        "Downloads icon for the specified game pass ID."
+        if isCircular == None:
+            isCircular = False
+        url = f"https://thumbnails.roblox.com/v1/game-passes?format=Png&gamePassIds={gamePassId}&isCircular={isCircular}&size=150x150"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        imageUrl = j['data']['imageUrl']
+        r = requests.get(imageUrl)
+        filename = imageUrl.split("/")[-1]
+        if r.status_code == 200:
+            r.raw.decode_content = True
+            with open(filename, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+            print(f'Image successfully downloaded: {filename}')
+            i = Image.open(filename, mode='r')
+            i.show()
+            return i
+        else:
+            warnings.warn(f'Error: Image could not be retrieved; request returned code {r.status_code}')
+            return f"Error Code {r.status_code}"
+    def downloadGameIcon(placeId, size, isCircular=None):
+        "Downloads the icon for the specific place ID."
+        validSizes = ('50x50','128x128','150x150','256x256','512x512')
+        if size in validSizes:
+            if isCircular == None:
+                isCircular = False
+            url = f"https://thumbnails.roblox.com/v1/places/gameicons?format=Png&isCircular={isCircular}&placeIds={placeId}&size={size}"
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter one of the valid sizes: {validSizes}")
+            return
+    def downloadGameThumbnails(universeId, size):
+        """Downloads all thumbnails for a specific universe ID."""
+        validSizes = ('256x144', '384x216','480x270','576x324','768x432')
+        if size in validSizes:
+            url = f"https://thumbnails.roblox.com/v1/games/multiget/thumbnails?format=Png&isCircular=true&size={size}&universeIds={universeId}"
+            print("Getting thumbnail data...")
+            r = requests.get(url)
+            j = json.loads(r.text)
+            print("Thumbnail data received.")
+            thumbs = j['data']['thumbnails']
+            numThumbs = len(thumbs)
+            thumbnailCounter = 0
+            for thumbnail in thumbs:
+                thumbnailCounter += 1
+                print(f"Downloading thumbnail {thumbnailCounter} of {numThumbs}...")
+                imageUrl = thumbnail['imageUrl']
+                r = requests.get(imageUrl)
+                if r.status_code == 200:
+                    r.raw.decode_content = True
+                    with open(filename, 'wb') as f:
+                        shutil.copyfileobj(r.raw, f)
+                    print(f'Image successfully downloaded: {filename}')
+                    i = Image.open(filename, mode='r')
+                    i.show()
+                    return i
+                else:
+                    warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                    return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter a valid size: {validSizes}")
+            return
+    def downloadGroupIcon(groupId, size):
+        validSizes = ('150x150','420x420')
+        if size in validSizes:
+            if isCircular == None:
+                isCircular = False
+            url = f"https://thumbnails.roblox.com/v1/groups/icons?format=Png&groupIds={groupId}&isCircular=false&size={size}"
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter one of the valid sizes: {validSizes}")
+            return
+    def downloadAvatarBust(userId, size, isCircular=None):
+        """Downloads the avatar bust for the specified user ID."""
+        validSizes = ('50x50', '60x60', '75x75')
+        if size in validSizes:
+            if isCircular == None:
+                isCircular = False
+            url = f"https://thumbnails.roblox.com/v1/users/avatar-bust?format=Png&isCircular={isCircular}&size={size}&userIds={userId}"
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter one of the valid sizes: {validSizes}")
+            return
+    def downloadAvatarHeadshot(userId, size, isCircular=None):
+        validSizes = ('48x48', '50x50', '60x60', '75x75', '110x110', '150x150', '180x180', '352x352', '420x420', '720x720')
+        if size in validSizes:
+            if isCircular == None:
+                isCircular = False
+            url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?format=Png&isCircular={isCircular}&size={size}&userIds={userId}"
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter one of the valid sizes: {validSizes}")
+            return
+    def downloadAvatarFullBody(userId, size, isCircular=None):
+        """Downloads the full body shot of the specified user ID's avatar."""
+        validSizes = ('30x30', '48x48', '50x50', '60x60', '75x75', '100x100', '110x110', '140x140', '150x150', '150x200', '180x180', '250x250', '352x352', '420x420', '720x720')
+        if size in validSizes:
+            if isCircular == None:
+                isCircular = False
+            url = f"https://thumbnails.roblox.com/v1/users/avatar?format=Png&isCircular={isCircular}&size={size}&userIds={userId}"
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter one of the valid sizes: {validSizes}")
+            return
+    def downloadOutfitPreview(outfitId, size, isCircular=None):
+        """Downloads the avatar bust for the specified user ID."""
+        validSizes = ('150x150', '420x420')
+        if size in validSizes:
+            if isCircular == None:
+                isCircular = False
+            url = f"https://thumbnails.roblox.com/v1/users/outfits?format=Png&isCircular={isCircular}&size={size}&userOutfitIds={outfitId}"
+            r = requests.get(url)
+            j = json.loads(r.text)
+            imageUrl = j['data']['imageUrl']
+            r = requests.get(imageUrl)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                print(f'Image successfully downloaded: {filename}')
+                i = Image.open(filename, mode='r')
+                i.show()
+                return i
+            else:
+                warnings.warn(f"Error, could not download image, request returned code {r.status_code}")
+                return f"Error Code {r.status_code}"
+        else:
+            Exception(f"Please enter one of the valid sizes: {validSizes}")
+            return
