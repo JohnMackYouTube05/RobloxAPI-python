@@ -6,6 +6,7 @@ import warnings
 import os
 import getpass
 from PIL import Image
+import shutil
 global cookie
 cookie = {'.ROBLOSECURITY': "your cookie here"}
 class Users:
