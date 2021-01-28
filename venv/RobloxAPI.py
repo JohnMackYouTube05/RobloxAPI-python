@@ -80,6 +80,23 @@ class Games:
         r = requests.get(url, cookies=cookie)
         j = json.loads(r.text)
         return j
+    def getGameProductInfo(universeId):
+        url = f"https://games.roblox.com/v1/games/games-product-info?universeIds={universeId}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j['data']
+    def getVotes(universeId):
+        url = f"https://games.roblox.com/v1/games/1700523381/{universeId}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j
+    def searchGamesByKeyword(keyword):
+        url = "https://games.roblox.com/v1/games/list?model.keyword={keyword}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j['games']
+
+
 class Groups:
     def getGroupInfo(groupId):
         """Gets group details for the specified group ID."""
@@ -184,24 +201,130 @@ class Catalog:
             r = requests.get(url)
             j = json.loads(r.text)
             return j['data']
-
-
-
-
-
-
-        
-        
-        
-        
-                
-                    
-                
-            
-            
-        
-        
-        
-        
-        
-        
+class Badges:
+    def getBadgeInfo(badgeId):
+        """Gets badge information for the specified badge ID."""
+        url = f"https://badges.roblox.com/v1/badges/{badgeId}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j
+    def updateBadgeInfo(badgeId, name, description, badgeEnabled):
+        """Sets badge information to the specified parameters. You must be the creator of the badge to modify, or else you won't be able to modify it."""
+        parameters = {
+	    "name": name,
+	    "description": description,
+	    "enabled": badgeEnabled
+        }
+        url = f"https://badges.roblox.com/v1/badges/{badgeId}"
+        r = requests.patch(url, params=parameters, cookies=cookie)
+        j = json.loads(r.text)
+        return j
+    def getBadgesByGame(universeId, limit=None):
+        url = f"https://badges.roblox.com/v1/universes/{universeId}/badges?limit={limit}&sortOrder=Asc"
+        acceptableLimits = (10, 25, 50, 100)
+        if limit in acceptableLimits:
+            r = requests.get(url)
+            j = json.loads(r.text)
+            data = j['data']
+            return data
+        else:
+            if limit == None:
+                warnings.warn('You did not specify a limit. The default limit is 100, and other valid limits are 10, 25, and 50.')
+                limit = 100
+                r = requests.get(url)
+                j = json.loads(r.text)
+                data = j['data']
+                return data
+            else:
+                e = Exception("You have entered an invalid limit, please enter a limit of 10, 25, 50, or 100. If you don't enter a limit at all however, the default is 100.")
+        return
+    def getBadgesFromUser(userId, limit=None):
+        """Returns a set amount of badges that the specified user has been awarded."""
+        url = f"https://badges.roblox.com/v1/users/{userId}/badges?limit={limit}&sortOrder=Desc"
+        acceptableLimits = (10, 25, 50, 100)
+        if limit in acceptableLimits:
+            r = requests.get(url)
+            j = json.loads(r.text)
+            data = j['data']
+            return data
+        else:
+            if limit == None:
+                warnings.warn('You did not specify a limit. The default limit is 100, and other valid limits are 10, 25, and 50.')
+                limit = 100
+                r = requests.get(url)
+                j = json.loads(r.text)
+                data = j['data']
+                return data
+            else:
+                e = Exception("You have entered an invalid limit, please enter a limit of 10, 25, 50, or 100. If you don't enter a limit at all however, the default is 100.")
+        return
+    def getBadgeAwardedTime(userId, badgeId):
+        """Returns the time that the specified badge ID was awarded to the specified user ID."""
+        url = f"https://badges.roblox.com/v1/users/{userId}/badges/awarded-dates?badgeIds={badgeId}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j['data']
+class Legacy:
+    def getRobux():
+        """Returns the Robux balance for the currently authenticated user."""
+        url = "https://api.roblox.com/my/balance"
+        r = requests.get(url, cookies=cookie)
+        j = json.loads(r.text)
+        return j
+    def userOwnsAsset(userId, assetId):
+        """Gets whether the specified user owns the specified asset, and returns True or False."""
+        url = f"https://api.roblox.com/ownership/hasasset?assetId={assetId}&userId={userId}"
+        r = requests.get(url)
+        if r.text == 'true':
+            return True
+        else:
+            return False
+    def getAssetInfo(assetId):
+        """Gets asset info for specified ID. User must have permissions to manage the asset or function won't work."""
+        url = f"https://api.roblox.com/assets/{assetId}/versions"
+        r = requests.get(url, cookies=cookie)
+        j = json.loads(r.text)
+        return j
+    def getGroups(userId):
+        """Get a user's joined groups"""
+        url = f"http://api.roblox.com/users/{userId}/groups"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j
+    def getDeviceInfo():
+        """Gets the device info of the current device"""
+        url = "https://api.roblox.com/reference/deviceinfo"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j
+class Develop:
+    def getPluginInfo(pluginId):
+        """Gets the information of the specified plugin ID."""
+        url = f"https://develop.roblox.com/v1/plugins?pluginIds={pluginId}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j['data']
+    def getUniverses(limit=None):
+        """Gets universes that the logged in user has made."""
+        url = f"https://develop.roblox.com/v1/user/universes?limit={limit}&sortOrder=Desc"
+        if limit in (10, 25, 50):
+            r = requests.get(url, cookies=cookie)
+            j = json.loads(r.text)
+            return j
+        else:
+            limit = 50
+            r = requests.get(url, cookies=cookie)
+            j = json.loads(r.text)
+            return j
+    def getRobloxBadges(userId):
+        """Get ROBLOX-created badges the specified user has earned, such as the Bricksmith badge."""
+        url = f"https://accountinformation.roblox.com/v1/users/{userId}/roblox-badges"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        return j
+    def universePayoutHistory(universeId, startDate, endDate):
+        """Gets payout history of the specified universe ID. You must have edit permissions on the universe for this function to work properly."""
+        url = f"https://engagementpayouts.roblox.com/v1/universe-payout-history?endDate={endDate}&startDate={startDate}&universeId={universeId}"
+        r = requests.get(url, cookies=cookie)
+        j = json.loads(r.text)
+        return j
