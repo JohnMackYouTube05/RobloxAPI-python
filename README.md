@@ -3,7 +3,7 @@ A Python wrapper for Roblox's REST API.
 You can read documentation on the Wiki page of this GitHub repo.
 
 ## Prerequisites:
-You need to have the requests Python module, the Pillow Python module, and the shutil module installed in order to use this API Wrapper. If you don't have it installed, please install it using
+You need to have the requests Python module, and the Pillow Python module installed in order to use this API Wrapper. If you don't have it installed, please install it using
 ```bash
 pip install requests
 pip install pillow
