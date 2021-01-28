@@ -7,7 +7,6 @@ You need to have the requests Python module, the Pillow Python module, and the s
 ```bash
 pip install requests
 pip install pillow
-pip install shutil
 ```
 or you can just use
 ```bash
